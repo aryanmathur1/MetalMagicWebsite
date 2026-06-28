@@ -43,7 +43,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   background: linear-gradient(110deg, transparent 0 44%, rgba(192, 132, 252, 0.08) 45%, transparent 46% 100%);
-  animation: scan 4.8s linear infinite;
+  animation: scan 10s linear infinite; /* <-- Changed from 4.8s to 15s */
   z-index: -1;
 }
 
@@ -106,6 +106,15 @@ img {
   display: block;
 }
 
+.site-shell img:not(.brand img) {
+  width: 100%;
+  height: clamp(160px, 24vh, 240px);
+  max-height: clamp(160px, 24vh, 240px);
+  object-fit: cover;
+  object-position: center;
+  border-radius: var(--radius);
+}
+
 .site-shell {
   position: relative;
   z-index: 2;
@@ -114,7 +123,7 @@ img {
 }
 
 .nav-wrap {
-  position: sticky;
+  position: sticky; 
   top: 14px;
   z-index: 20;
   width: min(calc(100% - 32px), var(--max));
@@ -262,7 +271,7 @@ h2 {
   min-height: 172vh;
   display: grid;
   align-items: start;
-  padding: 76px 0 42px;
+  padding: 20px 0 42px; /* <-- Changed the 76px to 20px */
   isolation: isolate;
 }
 
@@ -447,8 +456,8 @@ h2 {
 }
 
 .robot-float {
-  width: min(92%, 560px);
-  max-height: 520px;
+  width: min(92%, 720px);
+  max-height: 660px;
   object-fit: contain;
   filter: drop-shadow(0 28px 48px rgba(168, 85, 247, 0.28));
   animation: float 4.6s ease-in-out infinite;
@@ -1125,10 +1134,10 @@ h2 {
 
 @keyframes scan {
   0% {
-    transform: translateX(-40%);
+    transform: translateX(-80%); /* Changed from -40% */
   }
   100% {
-    transform: translateX(40%);
+    transform: translateX(80%); /* Changed from 40% */
   }
 }
 
