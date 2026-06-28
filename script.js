@@ -8,15 +8,19 @@ const initStarfield = () => {
 
   const canvas = document.createElement("canvas");
   const aura = document.createElement("div");
+  const readout = document.createElement("div");
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   canvas.className = "starfield-canvas";
   aura.className = "cursor-aura";
+  readout.className = "cursor-readout";
   canvas.setAttribute("aria-hidden", "true");
   aura.setAttribute("aria-hidden", "true");
+  readout.setAttribute("aria-hidden", "true");
   document.body.prepend(canvas);
   document.body.prepend(aura);
+  document.body.prepend(readout);
 
   let width = 0;
   let height = 0;
@@ -29,10 +33,10 @@ const initStarfield = () => {
     x: Math.random() * width,
     y: Math.random() * height,
     baseSize: 0.7 + Math.random() * 2.4,
-    vx: (Math.random() - 0.5) * 0.22,
-    vy: (Math.random() - 0.5) * 0.22,
+    vx: (Math.random() - 0.5) * 0.76,
+    vy: (Math.random() - 0.5) * 0.76,
     pulse: Math.random() * Math.PI * 2,
-    twinkle: 0.006 + Math.random() * 0.025,
+    twinkle: 0.018 + Math.random() * 0.04,
     color: colors[Math.floor(Math.random() * colors.length)],
   });
 
@@ -75,7 +79,7 @@ const initStarfield = () => {
         const radius = 150;
 
         if (distance < radius && distance > 0.1) {
-          const push = (1 - distance / radius) * 5.2;
+          const push = (1 - distance / radius) * 8.2;
           star.x += (dx / distance) * push;
           star.y += (dy / distance) * push;
         }
@@ -149,6 +153,30 @@ const initStarfield = () => {
 
 initStarfield();
 
+const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+
+const updateScrollStory = () => {
+  const hero = document.querySelector(".hero");
+  const story = document.querySelector(".home-story");
+
+  if (hero) {
+    const rect = hero.getBoundingClientRect();
+    const travel = Math.max(rect.height - window.innerHeight, 1);
+    const progress = clamp(-rect.top / travel);
+    hero.style.setProperty("--hero-progress", progress.toFixed(3));
+  }
+
+  if (story) {
+    const rect = story.getBoundingClientRect();
+    const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight * 0.9));
+    story.style.setProperty("--story-progress", progress.toFixed(3));
+  }
+};
+
+updateScrollStory();
+window.addEventListener("scroll", updateScrollStory, { passive: true });
+window.addEventListener("resize", updateScrollStory, { passive: true });
+
 const setNavState = () => {
   nav?.classList.toggle("scrolled", window.scrollY > 16);
 };
@@ -204,18 +232,18 @@ const countObserver = new IntersectionObserver(
 document.querySelectorAll("[data-count]").forEach((el) => countObserver.observe(el));
 
 const handleImageFailure = (img) => {
-    const parent = img.closest(".hero-visual, .member-card, .brand, .event-with-media");
-    if (!parent) return;
-    if (parent.classList.contains("member-card") && !parent.dataset.initial) {
-      const name = parent.querySelector("h3")?.textContent.trim() || "MM";
-      parent.dataset.initial = name
-        .split(/\s+/)
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
-    }
-    parent.classList.add("image-failed");
+  const parent = img.closest(".hero-visual, .member-card, .brand, .event-with-media");
+  if (!parent) return;
+  if (parent.classList.contains("member-card") && !parent.dataset.initial) {
+    const name = parent.querySelector("h3")?.textContent.trim() || "MM";
+    parent.dataset.initial = name
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }
+  parent.classList.add("image-failed");
 };
 
 document.querySelectorAll("img").forEach((img) => {
@@ -249,16 +277,56 @@ document.querySelectorAll("[data-tabs]").forEach((tabs) => {
 });
 
 if (!reduceMotion) {
-  document.querySelectorAll(".event-card, .feature-card, .stat-card, .member-card, .robot-card, .timeline-card, .btn").forEach((el) => {
+  const hoverSelector = [
+    ".hero-copy",
+    ".hero-visual",
+    ".story-panel",
+    ".event-card",
+    ".feature-card",
+    ".section-copy",
+    ".stat-card",
+    ".member-card",
+    ".robot-card",
+    ".timeline-card",
+    ".season-photo-slot",
+    ".robot-photo-slot",
+    ".video-frame",
+    ".tab-list button",
+    ".btn",
+    ".nav-links a",
+    ".footer-links a",
+    ".socials a",
+  ].join(", ");
+
+  const readout = document.querySelector(".cursor-readout");
+
+  const labelFor = (el) =>
+    el.dataset.hoverLabel ||
+    el.querySelector("h1, h2, h3, strong")?.textContent?.trim() ||
+    el.textContent.trim().split(/\s+/).slice(0, 4).join(" ");
+
+  document.querySelectorAll(hoverSelector).forEach((el) => {
     el.addEventListener("pointermove", (event) => {
       const rect = el.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
-      el.style.transform = `perspective(900px) rotateX(${-y * 4}deg) rotateY(${x * 5}deg) translateY(-4px)`;
+      const isSmall = el.matches(".btn, .nav-links a, .footer-links a, .socials a, .tab-list button");
+      const scale = isSmall ? 1.1 : 1.055;
+      const lift = isSmall ? -2 : -10;
+      el.style.setProperty("--local-x", `${(x + 0.5) * 100}%`);
+      el.style.setProperty("--local-y", `${(y + 0.5) * 100}%`);
+      el.style.setProperty("--hover-spot", "1");
+      el.style.transform = `perspective(900px) rotateX(${-y * 9}deg) rotateY(${x * 11}deg) translateY(${lift}px) scale(${scale})`;
+      if (readout) {
+        readout.textContent = labelFor(el);
+        readout.classList.add("active");
+      }
     });
 
     el.addEventListener("pointerleave", () => {
+      el.style.removeProperty("--hover-spot");
       el.style.transform = "";
+      readout?.classList.remove("active");
     });
   });
 }
