@@ -1370,12 +1370,21 @@ h2 {
   }
 
   .event-gallery {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  .event-gallery img:first-child,
-  .event-gallery .event-image-placeholder:first-child {
-    grid-column: auto;
+  .event-gallery > .event-img-main,
+  .event-gallery > .event-placeholder-main,
+  .event-gallery > img:first-child,
+  .event-gallery > .event-image-placeholder:first-child {
+    grid-column: 1 / -1;
+    min-height: 220px;
+  }
+
+  .event-gallery img,
+  .event-gallery .event-image-placeholder {
+    min-height: 120px;
   }
 
   .stat-card {
