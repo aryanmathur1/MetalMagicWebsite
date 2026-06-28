@@ -2,25 +2,31 @@ const nav = document.querySelector("[data-nav]");
 const menu = document.querySelector("[data-menu]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isDesktopInteractive = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 const initStarfield = () => {
   if (reduceMotion) return;
 
   const canvas = document.createElement("canvas");
-  const aura = document.createElement("div");
-  const readout = document.createElement("div");
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   canvas.className = "starfield-canvas";
-  aura.className = "cursor-aura";
-  readout.className = "cursor-readout";
   canvas.setAttribute("aria-hidden", "true");
-  aura.setAttribute("aria-hidden", "true");
-  readout.setAttribute("aria-hidden", "true");
   document.body.prepend(canvas);
-  document.body.prepend(aura);
-  document.body.prepend(readout);
+
+  let aura = null;
+  let readout = null;
+  if (isDesktopInteractive) {
+    aura = document.createElement("div");
+    readout = document.createElement("div");
+    aura.className = "cursor-aura";
+    readout.className = "cursor-readout";
+    aura.setAttribute("aria-hidden", "true");
+    readout.setAttribute("aria-hidden", "true");
+    document.body.prepend(aura);
+    document.body.prepend(readout);
+  }
 
   let width = 0;
   let height = 0;
@@ -147,8 +153,10 @@ const initStarfield = () => {
   resize();
   draw();
   window.addEventListener("resize", resize, { passive: true });
-  window.addEventListener("pointermove", movePointer, { passive: true });
-  window.addEventListener("pointerleave", hidePointer);
+  if (isDesktopInteractive) {
+    window.addEventListener("pointermove", movePointer, { passive: true });
+    window.addEventListener("pointerleave", hidePointer);
+  }
 };
 
 initStarfield();
@@ -158,6 +166,12 @@ const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const updateScrollStory = () => {
   const hero = document.querySelector(".hero");
   const story = document.querySelector(".home-story");
+
+  if (!isDesktopInteractive) {
+    hero?.style.setProperty("--hero-progress", "0");
+    story?.style.setProperty("--story-progress", "0");
+    return;
+  }
 
   if (hero) {
     const rect = hero.getBoundingClientRect();
@@ -255,7 +269,7 @@ const parallax = document.querySelector("[data-parallax]");
 window.addEventListener(
   "scroll",
   () => {
-    if (!parallax || reduceMotion) return;
+    if (!parallax || reduceMotion || !isDesktopInteractive) return;
     parallax.style.transform = `translateY(${window.scrollY * 0.04}px)`;
   },
   { passive: true }
@@ -276,7 +290,7 @@ document.querySelectorAll("[data-tabs]").forEach((tabs) => {
   });
 });
 
-if (!reduceMotion) {
+if (!reduceMotion && isDesktopInteractive) {
   const hoverSelector = [
     ".hero-copy",
     ".hero-visual",

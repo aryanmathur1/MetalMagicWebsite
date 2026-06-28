@@ -47,6 +47,17 @@ body::before {
   z-index: -1;
 }
 
+@media (hover: none), (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+
+  .cursor-aura,
+  .cursor-readout {
+    display: none !important;
+  }
+}
+
 .starfield-canvas,
 .cursor-aura {
   position: fixed;
@@ -273,6 +284,47 @@ h2 {
   align-items: start;
   padding: 20px 0 42px; /* <-- Changed the 76px to 20px */
   isolation: isolate;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding: 24px 0 28px;
+  }
+
+  .hero::after {
+    display: none;
+  }
+
+  .hero-bg-robot {
+    position: relative;
+    top: auto;
+    opacity: 0.48;
+    transform: none;
+    margin-bottom: 18px;
+  }
+
+  .hero-grid {
+    position: static;
+    transform: none;
+    opacity: 1;
+    min-height: auto;
+  }
+
+  .hero-title,
+  .hero-visual {
+    transform: none;
+  }
+
+  .hero-visual {
+    min-height: 320px;
+  }
+
+  .stagger {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .hero::after {
@@ -1336,6 +1388,29 @@ h2 {
 
   .page-hero {
     padding-top: 82px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .nav-links a:hover,
+  .btn:hover,
+  .member-card:hover,
+  .event-card:hover,
+  .robot-card:hover,
+  .story-panel:hover,
+  .timeline-card:hover,
+  .stat-card:hover,
+  .feature-card:hover,
+  .hero-copy:hover,
+  .hero-visual:hover,
+  .section-copy:hover,
+  .video-frame:hover,
+  .tab-list button:hover,
+  .footer-links a:hover,
+  .socials a:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: inherit !important;
   }
 }
 
