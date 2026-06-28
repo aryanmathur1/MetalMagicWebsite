@@ -106,7 +106,7 @@ img {
   display: block;
 }
 
-.site-shell img:not(.brand img) {
+.site-shell img:not(.brand img):not(.robot-float) {
   width: 100%;
   height: clamp(160px, 24vh, 240px);
   max-height: clamp(160px, 24vh, 240px);
@@ -1066,7 +1066,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 18px;
-  align-items: center;
+  align-items: start;
 }
 
 .footer-brand strong {
@@ -1079,12 +1079,19 @@ h2 {
   color: var(--muted);
 }
 
-.footer-links,
-.socials {
+.footer-links {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  grid-column: 1 / -1;
 }
 
 .footer-links a,
@@ -1094,6 +1101,43 @@ h2 {
   padding: 8px 10px;
   border: 1px solid rgba(192, 132, 252, 0.22);
   border-radius: var(--radius);
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.socials a svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.footer .socials {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.footer .socials img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+}
+
+.footer .socials svg {
+  width: 28px;
+  height: 28px;
+  display: block;
 }
 
 .socials a:hover,
