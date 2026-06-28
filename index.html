@@ -183,7 +183,7 @@
       }
     </style>
   </head>
-  <body>
+  <body class="home-page">
 
     <!-- ══════════════════════════════════════
          INTRO OVERLAY
@@ -379,16 +379,12 @@
           if (done) return;
           done = true;
           timers.forEach(clearTimeout);
-          window.removeEventListener('wheel',     onScroll);
-          window.removeEventListener('touchmove', onScroll);
           intro.classList.add('mm-zooming');
           setTimeout(function () {
             intro.classList.add('mm-gone');
             shell.classList.add('mm-visible');
           }, reduced ? 0 : 620);
         }
-
-        function onScroll() { dismiss(); }
 
         // 1 — photo fades + slow zoom
         schedule(60, function () {
@@ -429,9 +425,6 @@
         // 7 — auto-dismiss after hold
         schedule(3300, dismiss);
 
-        // scroll / swipe up to skip instantly
-        window.addEventListener('wheel',     onScroll, { passive: true });
-        window.addEventListener('touchmove', onScroll, { passive: true });
       })();
     </script>
 

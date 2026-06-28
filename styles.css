@@ -1414,6 +1414,56 @@ h2 {
   }
 }
 
+.home-page .hero {
+  min-height: auto;
+  padding: 24px 0 42px;
+}
+
+.home-page .hero::after,
+.home-page .hero-bg-robot {
+  display: none;
+}
+
+.home-page .hero-grid {
+  position: static;
+  top: auto;
+  min-height: auto;
+  transform: none;
+  opacity: 1;
+}
+
+.home-page .hero-copy,
+.home-page .hero-visual,
+.home-page .hero-grid {
+  min-width: 0;
+}
+
+.home-page .hero-title,
+.home-page .hero-visual {
+  transform: none;
+}
+
+.home-page .hero-visual {
+  min-height: 320px;
+}
+
+.home-page .stagger {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.home-page .hero-title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.home-page,
+.home-page .site-shell {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

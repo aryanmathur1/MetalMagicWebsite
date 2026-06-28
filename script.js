@@ -3,6 +3,8 @@ const menu = document.querySelector("[data-menu]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isDesktopInteractive = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const isHomePage = window.location.pathname === "/" || window.location.pathname.endsWith("/index.html");
+const canUseCursorEffects = () => isDesktopInteractive && window.innerWidth >= 900;
 
 const initStarfield = () => {
   if (reduceMotion) return;
@@ -17,7 +19,7 @@ const initStarfield = () => {
 
   let aura = null;
   let readout = null;
-  if (isDesktopInteractive) {
+  if (canUseCursorEffects()) {
     aura = document.createElement("div");
     readout = document.createElement("div");
     aura.className = "cursor-aura";
@@ -61,6 +63,8 @@ const initStarfield = () => {
   };
 
   const movePointer = (event) => {
+    if (!canUseCursorEffects()) return;
+
     pointer.x = event.clientX;
     pointer.y = event.clientY;
     pointer.active = true;
@@ -78,7 +82,7 @@ const initStarfield = () => {
     ctx.clearRect(0, 0, width, height);
 
     for (const star of stars) {
-      if (pointer.active) {
+      if (pointer.active && canUseCursorEffects()) {
         const dx = star.x - pointer.x;
         const dy = star.y - pointer.y;
         const distance = Math.hypot(dx, dy);
@@ -120,7 +124,7 @@ const initStarfield = () => {
         ctx.stroke();
       }
 
-      if (pointer.active) {
+      if (pointer.active && canUseCursorEffects()) {
         const lineDistance = Math.hypot(star.x - pointer.x, star.y - pointer.y);
         if (lineDistance < 190) {
           ctx.strokeStyle = `rgba(216, 180, 254, ${0.22 * (1 - lineDistance / 190)})`;
@@ -133,7 +137,7 @@ const initStarfield = () => {
       }
     }
 
-    if (pointer.active) {
+    if (pointer.active && canUseCursorEffects()) {
       const ringPulse = 6 * Math.sin(performance.now() * 0.006);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
       ctx.lineWidth = 1.4;
@@ -153,7 +157,7 @@ const initStarfield = () => {
   resize();
   draw();
   window.addEventListener("resize", resize, { passive: true });
-  if (isDesktopInteractive) {
+  if (canUseCursorEffects()) {
     window.addEventListener("pointermove", movePointer, { passive: true });
     window.addEventListener("pointerleave", hidePointer);
   }
@@ -167,24 +171,14 @@ const updateScrollStory = () => {
   const hero = document.querySelector(".hero");
   const story = document.querySelector(".home-story");
 
-  if (!isDesktopInteractive) {
+  if (isHomePage) {
     hero?.style.setProperty("--hero-progress", "0");
     story?.style.setProperty("--story-progress", "0");
     return;
   }
 
-  if (hero) {
-    const rect = hero.getBoundingClientRect();
-    const travel = Math.max(rect.height - window.innerHeight, 1);
-    const progress = clamp(-rect.top / travel);
-    hero.style.setProperty("--hero-progress", progress.toFixed(3));
-  }
-
-  if (story) {
-    const rect = story.getBoundingClientRect();
-    const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight * 0.9));
-    story.style.setProperty("--story-progress", progress.toFixed(3));
-  }
+  hero?.style.removeProperty("--hero-progress");
+  story?.style.removeProperty("--story-progress");
 };
 
 updateScrollStory();
@@ -269,7 +263,7 @@ const parallax = document.querySelector("[data-parallax]");
 window.addEventListener(
   "scroll",
   () => {
-    if (!parallax || reduceMotion || !isDesktopInteractive) return;
+    if (!parallax || reduceMotion || !isDesktopInteractive || !isHomePage) return;
     parallax.style.transform = `translateY(${window.scrollY * 0.04}px)`;
   },
   { passive: true }
@@ -290,7 +284,7 @@ document.querySelectorAll("[data-tabs]").forEach((tabs) => {
   });
 });
 
-if (!reduceMotion && isDesktopInteractive) {
+if (!reduceMotion && canUseCursorEffects()) {
   const hoverSelector = [
     ".hero-copy",
     ".hero-visual",
