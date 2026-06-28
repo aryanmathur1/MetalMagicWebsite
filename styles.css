@@ -34,6 +34,7 @@ body {
     var(--bg);
   background-size: 46px 46px, 46px 46px, auto, auto, auto;
   overflow-x: hidden;
+  cursor: crosshair;
 }
 
 body::before {
@@ -44,6 +45,29 @@ body::before {
   background: linear-gradient(110deg, transparent 0 44%, rgba(192, 132, 252, 0.08) 45%, transparent 46% 100%);
   animation: scan 8s linear infinite;
   z-index: -1;
+}
+
+.starfield-canvas,
+.cursor-aura {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.starfield-canvas {
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+
+.cursor-aura {
+  z-index: 1;
+  opacity: 0;
+  background: radial-gradient(circle at var(--cursor-x, 50%) var(--cursor-y, 50%), rgba(255, 255, 255, 0.16), rgba(192, 132, 252, 0.18) 8rem, transparent 18rem);
+  transition: opacity 180ms ease;
+}
+
+body.cursor-active .cursor-aura {
+  opacity: 1;
 }
 
 a {
@@ -57,6 +81,8 @@ img {
 }
 
 .site-shell {
+  position: relative;
+  z-index: 2;
   min-height: 100vh;
   animation: pageIn 520ms ease both;
 }
@@ -96,22 +122,21 @@ img {
 .brand img {
   width: 48px;
   height: 48px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 50%;
   border: 1px solid rgba(192, 132, 252, 0.45);
+  background: #4e2379;
 }
 
 .brand.image-failed::before {
-  content: "MM";
+  content: "";
   width: 48px;
   height: 48px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: white;
-  font: 900 0.82rem "Orbitron", sans-serif;
   border: 1px solid rgba(192, 132, 252, 0.6);
-  background: radial-gradient(circle at 30% 20%, #c084fc, #6b21a8 55%, #160921);
+  background: #4e2379 url("assets/brand/team-logo.svg") center / contain no-repeat;
   box-shadow: 0 0 24px rgba(168, 85, 247, 0.3);
 }
 
@@ -160,6 +185,17 @@ h2 {
   color: white;
   background: rgba(168, 85, 247, 0.18);
   box-shadow: 0 0 24px rgba(168, 85, 247, 0.22);
+}
+
+.nav-links a,
+.btn,
+.stat-card,
+.feature-card,
+.member-card,
+.event-card,
+.robot-card,
+.timeline-card {
+  transform-style: preserve-3d;
 }
 
 .nav-toggle {
@@ -559,6 +595,7 @@ h2 {
 
 .event-card {
   padding: clamp(22px, 4vw, 38px);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .event-card span,
@@ -575,6 +612,23 @@ h2 {
   font-size: clamp(1.4rem, 3vw, 2.25rem);
 }
 
+.event-date {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin: 8px 0 0;
+  padding: 5px 10px;
+  border: 1px solid rgba(192, 132, 252, 0.34);
+  border-radius: var(--radius);
+  color: white;
+  background: rgba(168, 85, 247, 0.13);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .event-with-media {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.6fr);
@@ -582,10 +636,41 @@ h2 {
   align-items: center;
 }
 
-.event-with-media img {
+.event-with-media img,
+.event-image-placeholder {
   width: 100%;
+  min-height: 240px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
+}
+
+.event-with-media img {
+  object-fit: cover;
+}
+
+.event-image-placeholder {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: white;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 50% 30%, rgba(192, 132, 252, 0.58), rgba(107, 33, 168, 0.4) 46%, rgba(13, 8, 25, 0.92));
+  background-size: 22px 22px, 22px 22px, auto;
+  text-align: center;
+}
+
+.event-image-placeholder strong {
+  font: 900 1.45rem "Orbitron", sans-serif;
+}
+
+.event-image-placeholder small {
+  color: var(--muted);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .event-with-media.image-failed img {
@@ -593,7 +678,7 @@ h2 {
 }
 
 .event-with-media.image-failed::after {
-  content: "DECODE";
+  content: attr(data-fallback-label);
   min-height: 240px;
   display: grid;
   place-items: center;
@@ -606,6 +691,26 @@ h2 {
     linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
     radial-gradient(circle at 50% 30%, rgba(192, 132, 252, 0.6), rgba(107, 33, 168, 0.42) 46%, rgba(13, 8, 25, 0.92));
   background-size: 22px 22px, 22px 22px, auto;
+}
+
+.event-details {
+  margin-top: 16px;
+  border-top: 1px solid rgba(192, 132, 252, 0.22);
+  padding-top: 14px;
+}
+
+.event-details summary {
+  color: var(--glow);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.event-details summary:hover {
+  color: white;
+}
+
+.event-details p {
+  margin: 10px 0 0;
 }
 
 .season-tabs {
@@ -955,5 +1060,10 @@ h2 {
     animation-duration: 1ms !important;
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
+  }
+
+  .starfield-canvas,
+  .cursor-aura {
+    display: none;
   }
 }
