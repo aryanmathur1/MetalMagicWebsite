@@ -208,9 +208,21 @@ const revealObserver = new IntersectionObserver(
   { threshold: 0.14 }
 );
 
+// With this:
 document.querySelectorAll(".reveal").forEach((el, index) => {
   el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
   revealObserver.observe(el);
+});
+
+// Immediately reveal anything already in view on load
+window.addEventListener("load", () => {
+  document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add("is-visible");
+      revealObserver.unobserve(el);
+    }
+  });
 });
 
 const countObserver = new IntersectionObserver(
