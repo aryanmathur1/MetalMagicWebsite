@@ -1315,7 +1315,9 @@ h2 {
     top: calc(100% + 10px);
     right: 0;
     left: auto;
-    width: min(260px, calc(100vw - 24px));
+    width: auto;
+    min-width: 180px;
+    max-width: calc(100vw - 24px);
     display: none;
     padding: 12px;
     border: 1px solid var(--line);
@@ -1326,12 +1328,12 @@ h2 {
 
   .nav-links.open {
     display: grid;
-    justify-items: end;
+    justify-items: stretch;
   }
 
   .nav-links.open a {
     width: 100%;
-    text-align: right;
+    text-align: left;
   }
 
   .hero-grid,
