@@ -9,15 +9,108 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .robot-hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-top: -90px;
+        padding-top: 90px;
+        padding-bottom: clamp(72px, 12vw, 120px);
+      }
+
+      .robot-hero-bg {
+        position: absolute;
+        inset: 0;
+        background: url('assets/homebg.jpg') center 25% / cover no-repeat;
+        transform: scale(1.04);
+        animation: robot-hero-zoom 18s ease-out forwards;
+        z-index: 0;
+      }
+
+      @keyframes robot-hero-zoom {
+        to { transform: scale(1); }
+      }
+
+      .robot-hero-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(12, 7, 20, 0.72) 0%,
+          rgba(12, 7, 20, 0.18) 18%,
+          transparent 38%,
+          transparent 62%,
+          rgba(12, 7, 20, 0.55) 82%,
+          rgba(12, 7, 20, 0.94) 100%
+        );
+        pointer-events: none;
+      }
+
+      .robot-hero-content {
+        position: relative;
+        z-index: 2;
+        width: min(calc(100% - 36px), 760px);
+        background: rgba(10, 6, 20, 0.72);
+        border: 1px solid rgba(192, 132, 252, 0.3);
+        border-radius: 10px;
+        padding: clamp(28px, 5vw, 52px);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+        text-align: left;
+      }
+
+      .robot-hero-content .eyebrow {
+        margin-bottom: 10px;
+      }
+
+      .robot-hero-content h1 {
+        margin: 0 0 20px;
+        font-size: clamp(1.8rem, 4vw, 3.2rem);
+        line-height: 1.05;
+      }
+
+      .robot-hero-content p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.86);
+        max-width: 640px;
+      }
+
+      @media (max-width: 760px) {
+        .robot-hero {
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding-top: 120px; /* ← add this (accounts for sticky nav + breathing room) */
+          padding-bottom: 28px;
+          min-height: 0;
+        }
+
+        .robot-hero-bg {
+          background-position: 86% 25%;
+        }
+
+        .robot-hero-content {
+          width: min(calc(100% - 24px), 760px);
+          margin: 0 12px 0 auto;
+          padding: 24px;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="site-shell">
-      <header class="nav-wrap" data-nav><a class="brand" href="index.html"><img src="assets/brand/team-logo.svg" alt="Metal Magic team logo" /><span><strong>Metal Magic</strong><small>#23362</small></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" data-menu-toggle><span></span><span></span><span></span></button><nav class="nav-links" data-menu><a href="index.html">Home</a><a href="about.html">About</a><a href="outreach.html">Outreach</a><a href="robot-design.html" aria-current="page">Robot & Design</a><a href="awards.html">Awards & Competitions</a><a href="http://magichacks.org" target="_blank" rel="noreferrer">Code Crush</a></nav></header>
+      <header class="nav-wrap" data-nav><a class="brand" href="index.html"><img src="assets/brand/team-logo.svg" alt="Metal Magic team logo" /><span><strong>Metal Magic</strong><small>#23362</small></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" data-menu-toggle><span></span><span></span><span></span></button><nav class="nav-links" data-menu><a href="index.html">Home</a><a href="about.html">About</a><a href="outreach.html">Outreach</a><a href="robot-design.html" aria-current="page">Robot & Design</a><a href="awards.html">Awards & Competitions</a><a href="apply.html">Apply</a><a href="https://hcb.hackclub.com/donations/start/metalmagic" target="_blank" rel="noreferrer">Donate</a></nav></header>
       <main>
-        <section class="page-hero page-section">
-          <p class="eyebrow reveal">Robot Systems</p>
-          <h1 class="reveal">Iterating fast, machining smarter, scoring cleaner.</h1>
-          <p class="reveal">Our design history moves from rookie mecanum builds to custom panels, autonomous sorting, odometry, and reliable game-piece launchers.</p>
+        <section class="robot-hero">
+          <div class="robot-hero-bg"></div>
+          <div class="robot-hero-content reveal">
+            <p class="eyebrow">Robot Systems</p>
+            <h1>Iterating fast, machining smarter, scoring cleaner.</h1>
+            <p>Our design history moves from rookie mecanum builds to custom panels, autonomous sorting, odometry, and reliable game-piece launchers.</p>
+          </div>
         </section>
         <section class="season-tabs page-section" data-tabs>
           <div class="tab-list reveal" role="tablist" aria-label="Robot seasons">
@@ -26,24 +119,65 @@
             <button type="button" data-tab="centerstage">2023-2024 CENTERSTAGE</button>
           </div>
           <div class="tab-panel active reveal" data-panel="decode">
-            <div class="video-frame"><iframe src="https://www.youtube.com/embed/lc0-tKASIY0" title="12 ball sorted autonomous for states and regionals" allowfullscreen></iframe></div>
-            <p class="caption">12 ball sorted autonomous for states/regionals</p>
             <div class="robot-grid">
-              <article class="robot-card"><h2>V4 Magic Machine</h2><p>Improved iteration of V3 with a more reliable launching system. Built a 12-ball sorted autonomous with leave points and placed 9th in Blue Crab division at Chesapeake Championship.</p><div class="robot-photo-slot"><img src="assets/robot/hero-robot.png" alt="V4 Magic Machine robot render" /></div></article>
-              <article class="robot-card"><h2>V3 Magic Machine</h2><p>Used at the 2nd and 3rd qualifiers and qualified for Chesapeake Championship twice. Featured custom aluminum side panels and drivetrain, a lowered 3D-printed spindexer, angle-adjustable launcher, and a 9-ball autonomous with motif pattern plus leave points.</p><div class="robot-photo-slot"><span>Robot Photo</span><small>Add V3 image</small></div></article>
-              <article class="robot-card"><h2>V2 Magic Machine</h2><p>First competition robot with surgical tubing intake, spindexer, and adjustable launcher. Qualified for playoffs and was mostly 3D-printed or custom machined.</p><div class="robot-photo-slot"><span>Robot Photo</span><small>Add V2 image</small></div></article>
-              <article class="robot-card"><h2>Robot in 30 Hours</h2><p>Gecko wheel vertical spinning intake plus horizontal Gecko wheel launcher, mounted on a custom chassis that was lighter with a lower center of gravity than the previous goBilda Strafer.</p><a class="text-link" href="https://youtu.be/vDX-ht7H9Fw" target="_blank" rel="noreferrer">Watch reveal</a><div class="robot-photo-slot"><span>Robot Photo</span><small>Add RI30H image</small></div></article>
+              <article class="robot-card"><h2>V4 Magic Machine</h2><p>Improved iteration of V3 with a more reliable launching system. Built a 12-ball sorted autonomous with leave points and placed 9th in Blue Crab division at Chesapeake Championship.</p><div class="robot-photo-slot"><img src="assets/robot/decodev4.jpg" alt="V4 Magic Machine robot render" /></div></article>
+              <article class="robot-card"><h2>V3 Magic Machine</h2><p>Used at the 2nd and 3rd qualifiers and qualified for Chesapeake Championship twice. Featured custom aluminum side panels and drivetrain, a lowered 3D-printed spindexer, angle-adjustable launcher, and a 9-ball autonomous with motif pattern plus leave points.</p><div class="robot-photo-slot"><img src="assets/robot/decodev3.jpg" alt="V3 Magic Machine robot photo" /></div></article>
+              <article class="robot-card"><h2>V2 Magic Machine</h2><p>First competition robot with surgical tubing intake, spindexer, and adjustable launcher. Qualified for playoffs and was mostly 3D-printed or custom machined.</p><div class="robot-photo-slot"><img src="assets/robot/decodev2.jpg" alt="V2 Magic Machine robot photo" /></div></article>
+              <article class="robot-card"><h2>Robot in 30 Hours</h2><p>Gecko wheel vertical spinning intake plus horizontal Gecko wheel launcher, mounted on a custom chassis that was lighter with a lower center of gravity than the previous goBilda Strafer.</p><a class="text-link" href="https://youtu.be/vDX-ht7H9Fw" target="_blank" rel="noreferrer">Watch reveal</a><div class="robot-photo-slot"><img src="assets/robot/decode30.jpg" alt="Robot in 30 Hours robot photo" /></div></article>
             </div>
+            <div class="video-frame">
+              <iframe 
+                width="560" 
+                height="315" 
+                src="https://www.youtube.com/embed/lc0-tKASIY0" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+              </iframe>
+            </div>
+            <p class="caption">12 ball sorted autonomous for states/regionals</p>
           </div>
           <div class="tab-panel reveal" data-panel="deep">
-            <article class="robot-card wide"><h2>MagicBot V2.5</h2><p>goBilda drivetrain with odometry pods and Pinpoint IMU. Two linear slides with hook for hanging, arm and claw for sample intake and transfer to a pivoting bucket, specimen scoring arm, and a front bumper for sample pushing.</p><ul class="glow-list"><li>#10 OPR in Chesapeake after district championships</li><li>5-sample autonomous with object detection</li><li>4-specimen autonomous</li><li>15-sample teleop / 10-specimen teleop</li><li>Level 2 Ascent</li></ul><div class="robot-photo-slot"><span>Robot Photo</span><small>Add INTO THE DEEP image</small></div></article>
+            <article class="robot-card wide"><h2>MagicBot V2.5</h2><p>goBilda drivetrain with odometry pods and Pinpoint IMU. Two linear slides with hook for hanging, arm and claw for sample intake and transfer to a pivoting bucket, specimen scoring arm, and a front bumper for sample pushing.</p><ul class="glow-list"><li>#10 OPR in Chesapeake after district championships</li><li>5-sample autonomous with object detection</li><li>4-specimen autonomous</li><li>15-sample teleop / 10-specimen teleop</li><li>Level 2 Ascent</li></ul><div class="robot-photo-slot"><img src="assets/robot/intothedeep25.jpg" alt="INTO THE DEEP robot photo" /></div></article>
           </div>
           <div class="tab-panel reveal" data-panel="centerstage">
-            <article class="robot-card wide"><h2>Rookie Bot</h2><p>goBilda drivetrain with mecanum wheels and a single rotating arm motor with claw to pick up and score pixels on the backdrop.</p><div class="robot-photo-slot"><span>Robot Photo</span><small>Add CENTERSTAGE image</small></div></article>
+            <article class="robot-card wide"><h2>Speed Duck (Rookie Bot)</h2><p>goBilda drivetrain with mecanum wheels and a single rotating arm motor with claw to pick up and score pixels on the backdrop.</p><div class="robot-photo-slot"><img src="assets/robot/centerstage.jpg" alt="CENTERSTAGE robot photo" /></div></article>
           </div>
         </section>
       </main>
-      <footer class="footer"><div class="footer-brand"><strong>Metal Magic</strong><span>FTC Team #23362</span></div><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="outreach.html">Outreach</a><a href="awards.html">Awards</a><a href="https://hcb.hackclub.com/donations/start/metal-magic-ftc-23362" target="_blank" rel="noreferrer">Donate</a></div><div class="socials"><a href="https://www.instagram.com/metalmagicftc" target="_blank" rel="noreferrer">IG</a><a href="https://www.youtube.com/@metalmagicftc" target="_blank" rel="noreferrer">YT</a><a href="https://x.com/metalmagicftc" target="_blank" rel="noreferrer">X</a><a href="mailto:metalmagicftc@gmail.com">Email</a></div><p class="footer-meta">(571) 749-9220 | metalmagicftc@gmail.com | Copyright Metal Magic FTC #23362</p></footer>
+      <footer class="footer">
+        <div class="footer-brand"><strong>Metal Magic</strong><span>FTC Team #23362</span></div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="about.html">About</a>
+          <a href="outreach.html">Outreach</a>
+          <a href="awards.html">Awards</a>
+          <a href="apply.html">Apply</a>
+          <a href="https://hcb.hackclub.com/donations/start/metal-magic-ftc-23362" target="_blank" rel="noreferrer">Donate</a>
+        </div>
+        <div class="socials" aria-label="Social links">
+          <a href="https://www.instagram.com/metalmagicftc" target="_blank" rel="noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="3" width="18" height="18" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+              <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor"></circle>
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/@metalmagicftc" target="_blank" rel="noreferrer" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21.6 7.2a2.8 2.8 0 0 0-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5a2.8 2.8 0 0 0-2 2A29.2 29.2 0 0 0 2 12a29.2 29.2 0 0 0 .4 4.8 2.8 2.8 0 0 0 2 2c1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5a2.8 2.8 0 0 0 2-2A29.2 29.2 0 0 0 22 12a29.2 29.2 0 0 0-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z" fill="currentColor"></path>
+            </svg>
+          </a>
+          <a href="mailto:metalmagicftc@gmail.com" aria-label="Email">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm0 2 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </div>
+        <p class="footer-meta">(571) 749-9220 | metalmagicftc@gmail.com | Copyright Metal Magic FTC #23362</p>
+      </footer>
     </div>
     <script src="script.js"></script>
   </body>
