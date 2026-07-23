@@ -17,8 +17,65 @@
   box-sizing: border-box;
 }
 
+/* ── Scrolling announcement banner ── */
+.announce-bar {
+  position: relative;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  padding: 9px 0;
+  color: #ffffff;
+  text-decoration: none;
+  background: linear-gradient(90deg, #6b21a8, #a855f7, #7c3aed);
+  border-bottom: 1px solid rgba(192, 132, 252, 0.4);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.28);
+}
+
+.announce-track {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  gap: 0;
+  white-space: nowrap;
+  animation: announce-scroll 22s linear infinite;
+}
+
+.announce-bar:hover .announce-track {
+  animation-play-state: paused;
+}
+
+.announce-track span {
+  padding: 0 26px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.announce-track span::after {
+  content: '\25B8'; /* small triangle separator */
+  margin-left: 26px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@keyframes announce-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announce-track {
+    animation: none;
+    justify-content: center;
+  }
+}
+
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -33,7 +90,6 @@ body {
     radial-gradient(circle at 8% 86%, rgba(124, 58, 237, 0.2), transparent 26rem),
     var(--bg);
   background-size: 46px 46px, 46px 46px, auto, auto, auto;
-  overflow-x: hidden;
   cursor: crosshair;
 }
 
