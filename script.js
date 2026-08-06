@@ -276,7 +276,7 @@ window.addEventListener(
   "scroll",
   () => {
     if (!parallax || reduceMotion || !isDesktopInteractive || !isHomePage) return;
-    parallax.style.transform = `translateY(${window.scrollY * 0.04}px)`;
+    parallax.style.transform = `translateY(${window.scrollY * 0.02}px)`;
   },
   { passive: true }
 );
@@ -331,12 +331,13 @@ if (!reduceMotion && canUseCursorEffects()) {
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
       const isSmall = el.matches(".btn, .nav-links a, .footer-links a, .socials a, .tab-list button");
-      const scale = isSmall ? 1.1 : 1.055;
-      const lift = isSmall ? -2 : -10;
+      const scale = isSmall ? 1.06 : 1.015;
+      const lift = isSmall ? -1 : -4;
       el.style.setProperty("--local-x", `${(x + 0.5) * 100}%`);
       el.style.setProperty("--local-y", `${(y + 0.5) * 100}%`);
       el.style.setProperty("--hover-spot", "1");
-      el.style.transform = `perspective(900px) rotateX(${-y * 9}deg) rotateY(${x * 11}deg) translateY(${lift}px) scale(${scale})`;
+      // subtle uniform lift — no 3D tilt, so the box and its image move together
+      el.style.transform = `translateY(${lift}px) scale(${scale})`;
       if (readout) {
         readout.textContent = labelFor(el);
         readout.classList.add("active");

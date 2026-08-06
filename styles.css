@@ -1143,8 +1143,38 @@ h2 {
 }
 
 .season-photo-slot {
-  min-height: clamp(320px, 46vh, 520px);
-  padding: 10px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  overflow: visible;
+}
+
+.season-photo-slot img {
+  padding: 0;
+  border-radius: var(--radius);
+}
+
+/* Two-up photo grid (DECODE): 50/50 on desktop, stacked on mobile */
+.season-photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.season-photo-grid .season-photo-slot {
+  margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .season-photo-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .glow-list {
