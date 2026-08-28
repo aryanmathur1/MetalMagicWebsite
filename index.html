@@ -154,7 +154,7 @@
       /* ── fade exit ── */
       #mm-intro.mm-zooming {
         opacity: 0;
-        transition: opacity 0.6s ease;
+        transition: opacity 0.45s ease;
         pointer-events: none;
       }
       #mm-intro.mm-gone { display: none; }
@@ -424,16 +424,37 @@
         var timers = [];
         function schedule(ms, fn) { timers.push(after(ms, fn)); }
 
+        // scroll / click / key input lets the visitor skip the intro
+        var skipEvents = ['wheel', 'scroll', 'touchstart', 'touchmove', 'keydown', 'pointerdown', 'click'];
+
+        function addSkipListeners() {
+          if (done) return;
+          skipEvents.forEach(function (evt) {
+            window.addEventListener(evt, dismiss, { passive: true });
+          });
+        }
+
+        function removeSkipListeners() {
+          skipEvents.forEach(function (evt) {
+            window.removeEventListener(evt, dismiss);
+          });
+        }
+
         function dismiss() {
           if (done) return;
           done = true;
+          removeSkipListeners();
           timers.forEach(clearTimeout);
           intro.classList.add('mm-zooming');
           setTimeout(function () {
             intro.classList.add('mm-gone');
             shell.classList.add('mm-visible');
-          }, reduced ? 0 : 620);
+          }, reduced ? 0 : 460);
         }
+
+        // arm skipping almost immediately, but not so early that a stray
+        // event fired during page load kills the intro before it renders
+        after(250, addSkipListeners);
 
         // 1 — photo fades + slow zoom
         schedule(60, function () {
