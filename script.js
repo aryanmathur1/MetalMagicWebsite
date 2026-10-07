@@ -151,13 +151,22 @@ const initStarfield = (host, fixed) => {
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
+    // Phones fire resize whenever the address bar slides in or out while scrolling;
+    // nothing to do unless the canvas really changed size.
+    if (rect.width === width && rect.height === height) return;
+
     const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
     width = rect.width;
     height = rect.height;
     canvas.width = Math.floor(width * ratio);
     canvas.height = Math.floor(height * ratio);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    stars = Array.from({ length: Math.min(110, Math.max(24, Math.floor((width * height) / 13000))) }, makeStar);
+
+    // Keep the stars already drifting and only add or drop a few to match the new area,
+    // so a resize never reshuffles the whole sky.
+    const target = Math.min(110, Math.max(24, Math.floor((width * height) / 13000)));
+    stars.length = Math.min(stars.length, target);
+    while (stars.length < target) stars.push(makeStar());
     sync();
   };
 
@@ -176,6 +185,8 @@ const initStarfield = (host, fixed) => {
     window.addEventListener(
       "pointermove",
       (event) => {
+        // Mouse only: touches and pens must never drag the stars around
+        if (event.pointerType !== "mouse") return;
         const rect = canvas.getBoundingClientRect();
         pointer.x = event.clientX - rect.left;
         pointer.y = event.clientY - rect.top;

@@ -102,6 +102,10 @@ h3 {
 .starfield-fixed {
   position: fixed;
   z-index: 0;
+  /* tallest viewport, so the canvas doesn't resize as a phone's address bar hides */
+  bottom: auto;
+  height: 100vh;
+  height: 100lvh;
 }
 
 main,
@@ -705,20 +709,16 @@ main,
 .sponsor-tier-label {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 12px;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  gap: 12px;
+  margin-bottom: 14px;
+  line-height: 1.1;
   text-transform: uppercase;
-  color: var(--brand);
 }
 
 .sponsor-tier-label::before {
   content: "";
-  width: 10px;
-  height: 10px;
+  width: 0.62em;
+  height: 0.62em;
   background: currentColor;
 }
 
@@ -729,12 +729,29 @@ main,
   background: #d9d1e6;
 }
 
-.sponsor-tier-gold .sponsor-tier-label::before {
-  background: #d9a400;
+/* Magic gets its own ornamental face; Gold uses the site's heading style, Silver the body style */
+.sponsor-tier-magic .sponsor-tier-label {
+  font-family: "Cinzel Decorative", Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--brand);
 }
 
-.sponsor-tier-silver .sponsor-tier-label::before {
-  background: #9a96a3;
+.sponsor-tier-gold .sponsor-tier-label {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-stretch: 125%;
+  letter-spacing: 0.01em;
+  color: #9a6f00;
+}
+
+.sponsor-tier-silver .sponsor-tier-label {
+  font-size: 1.02rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #6c6877;
 }
 
 .sponsor-grid {
