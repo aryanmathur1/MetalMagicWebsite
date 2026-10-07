@@ -1,285 +1,10 @@
-const nav = document.querySelector("[data-nav]");
 const menu = document.querySelector("[data-menu]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const isDesktopInteractive = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-const isHomePage = window.location.pathname === "/" || window.location.pathname.endsWith("/index.html");
-const canUseCursorEffects = () => isDesktopInteractive && window.innerWidth >= 900;
-
-const initStarfield = () => {
-  if (reduceMotion) return;
-
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  canvas.className = "starfield-canvas";
-  canvas.setAttribute("aria-hidden", "true");
-  document.body.prepend(canvas);
-
-  let aura = null;
-  let readout = null;
-  if (canUseCursorEffects()) {
-    aura = document.createElement("div");
-    readout = document.createElement("div");
-    aura.className = "cursor-aura";
-    readout.className = "cursor-readout";
-    aura.setAttribute("aria-hidden", "true");
-    readout.setAttribute("aria-hidden", "true");
-    document.body.prepend(aura);
-    document.body.prepend(readout);
-  }
-
-  let width = 0;
-  let height = 0;
-  let pixelRatio = 1;
-  let stars = [];
-  const pointer = { x: -9999, y: -9999, active: false };
-  const colors = ["rgba(255,255,255,", "rgba(216,180,254,", "rgba(192,132,252,"];
-
-  const makeStar = () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    baseSize: 0.7 + Math.random() * 2.4,
-    vx: (Math.random() - 0.5) * 0.76,
-    vy: (Math.random() - 0.5) * 0.76,
-    pulse: Math.random() * Math.PI * 2,
-    twinkle: 0.018 + Math.random() * 0.04,
-    color: colors[Math.floor(Math.random() * colors.length)],
-  });
-
-  const resize = () => {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(width * pixelRatio);
-    canvas.height = Math.floor(height * pixelRatio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-
-    const targetCount = Math.min(260, Math.max(120, Math.floor((width * height) / 7800)));
-    stars = Array.from({ length: targetCount }, makeStar);
-  };
-
-  const movePointer = (event) => {
-    if (!canUseCursorEffects()) return;
-
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
-    pointer.active = true;
-    document.body.classList.add("cursor-active");
-    document.documentElement.style.setProperty("--cursor-x", `${pointer.x}px`);
-    document.documentElement.style.setProperty("--cursor-y", `${pointer.y}px`);
-  };
-
-  const hidePointer = () => {
-    pointer.active = false;
-    document.body.classList.remove("cursor-active");
-  };
-
-  const draw = () => {
-    ctx.clearRect(0, 0, width, height);
-
-    for (const star of stars) {
-      if (pointer.active && canUseCursorEffects()) {
-        const dx = star.x - pointer.x;
-        const dy = star.y - pointer.y;
-        const distance = Math.hypot(dx, dy);
-        const radius = 150;
-
-        if (distance < radius && distance > 0.1) {
-          const push = (1 - distance / radius) * 8.2;
-          star.x += (dx / distance) * push;
-          star.y += (dy / distance) * push;
-        }
-      }
-
-      star.x += star.vx;
-      star.y += star.vy;
-      star.pulse += star.twinkle;
-
-      if (star.x < -12) star.x = width + 12;
-      if (star.x > width + 12) star.x = -12;
-      if (star.y < -12) star.y = height + 12;
-      if (star.y > height + 12) star.y = -12;
-
-      const glow = 0.34 + Math.sin(star.pulse) * 0.22;
-      const size = star.baseSize + glow;
-      ctx.beginPath();
-      ctx.fillStyle = `${star.color}${0.42 + glow})`;
-      ctx.shadowBlur = 16 + size * 4;
-      ctx.shadowColor = "#c084fc";
-      ctx.arc(star.x, star.y, size, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (star.baseSize > 2.2) {
-        ctx.strokeStyle = `${star.color}0.26)`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(star.x - size * 3.5, star.y);
-        ctx.lineTo(star.x + size * 3.5, star.y);
-        ctx.moveTo(star.x, star.y - size * 3.5);
-        ctx.lineTo(star.x, star.y + size * 3.5);
-        ctx.stroke();
-      }
-
-      if (pointer.active && canUseCursorEffects()) {
-        const lineDistance = Math.hypot(star.x - pointer.x, star.y - pointer.y);
-        if (lineDistance < 190) {
-          ctx.strokeStyle = `rgba(216, 180, 254, ${0.22 * (1 - lineDistance / 190)})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(star.x, star.y);
-          ctx.lineTo(pointer.x, pointer.y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    if (pointer.active && canUseCursorEffects()) {
-      const ringPulse = 6 * Math.sin(performance.now() * 0.006);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.arc(pointer.x, pointer.y, 148 + ringPulse, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.strokeStyle = "rgba(192, 132, 252, 0.2)";
-      ctx.beginPath();
-      ctx.arc(pointer.x, pointer.y, 78 - ringPulse, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    ctx.shadowBlur = 0;
-    requestAnimationFrame(draw);
-  };
-
-  resize();
-  draw();
-  window.addEventListener("resize", resize, { passive: true });
-  if (canUseCursorEffects()) {
-    window.addEventListener("pointermove", movePointer, { passive: true });
-    window.addEventListener("pointerleave", hidePointer);
-  }
-};
-
-initStarfield();
-
-const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-
-const updateScrollStory = () => {
-  const hero = document.querySelector(".hero");
-  const story = document.querySelector(".home-story");
-
-  if (isHomePage) {
-    hero?.style.setProperty("--hero-progress", "0");
-    story?.style.setProperty("--story-progress", "0");
-    return;
-  }
-
-  hero?.style.removeProperty("--hero-progress");
-  story?.style.removeProperty("--story-progress");
-};
-
-updateScrollStory();
-window.addEventListener("scroll", updateScrollStory, { passive: true });
-window.addEventListener("resize", updateScrollStory, { passive: true });
-
-const setNavState = () => {
-  nav?.classList.toggle("scrolled", window.scrollY > 16);
-};
-
-setNavState();
-window.addEventListener("scroll", setNavState, { passive: true });
 
 menuToggle?.addEventListener("click", () => {
-  menu?.classList.toggle("open");
+  const open = menu?.classList.toggle("open");
+  menuToggle.setAttribute("aria-expanded", String(Boolean(open)));
 });
-
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.14 }
-);
-
-// With this:
-document.querySelectorAll(".reveal").forEach((el, index) => {
-  el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
-  revealObserver.observe(el);
-});
-
-// Immediately reveal anything already in view on load
-window.addEventListener("load", () => {
-  document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      el.classList.add("is-visible");
-      revealObserver.unobserve(el);
-    }
-  });
-});
-
-const countObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const target = Number(el.dataset.count || 0);
-      const duration = 1300;
-      const start = performance.now();
-
-      const tick = (now) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const value = Math.floor(eased * target);
-        el.textContent = value.toLocaleString();
-        if (progress < 1) requestAnimationFrame(tick);
-      };
-
-      requestAnimationFrame(tick);
-      countObserver.unobserve(el);
-    });
-  },
-  { threshold: 0.55 }
-);
-
-document.querySelectorAll("[data-count]").forEach((el) => countObserver.observe(el));
-
-const handleImageFailure = (img) => {
-  const parent = img.closest(".hero-visual, .member-card, .brand, .event-with-media");
-  if (!parent) return;
-  if (parent.classList.contains("member-card") && !parent.dataset.initial) {
-    const name = parent.querySelector("h3")?.textContent.trim() || "MM";
-    parent.dataset.initial = name
-      .split(/\s+/)
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }
-  parent.classList.add("image-failed");
-};
-
-document.querySelectorAll("img").forEach((img) => {
-  img.addEventListener("error", () => handleImageFailure(img));
-  if (img.complete && img.naturalWidth === 0) handleImageFailure(img);
-});
-
-const parallax = document.querySelector("[data-parallax]");
-window.addEventListener(
-  "scroll",
-  () => {
-    if (!parallax || reduceMotion || !isDesktopInteractive || !isHomePage) return;
-    parallax.style.transform = `translateY(${window.scrollY * 0.02}px)`;
-  },
-  { passive: true }
-);
 
 document.querySelectorAll("[data-tabs]").forEach((tabs) => {
   const buttons = tabs.querySelectorAll("[data-tab]");
@@ -296,58 +21,175 @@ document.querySelectorAll("[data-tabs]").forEach((tabs) => {
   });
 });
 
-if (!reduceMotion && canUseCursorEffects()) {
-  const hoverSelector = [
-    ".hero-copy",
-    ".hero-visual",
-    ".story-panel",
-    ".event-card",
-    ".feature-card",
-    ".section-copy",
-    ".stat-card",
-    ".member-card",
-    ".robot-card",
-    ".timeline-card",
-    ".season-photo-slot",
-    ".robot-photo-slot",
-    ".video-frame",
-    ".tab-list button",
-    ".btn",
-    ".nav-links a",
-    ".footer-links a",
-    ".socials a",
-  ].join(", ");
+// Hide photos that fail to load instead of showing a broken-image icon
+document.querySelectorAll("img").forEach((img) => {
+  const hide = () => (img.style.visibility = "hidden");
+  img.addEventListener("error", hide);
+  if (img.complete && img.naturalWidth === 0) hide();
+});
 
-  const readout = document.querySelector(".cursor-readout");
+// Starfield: fills the whole viewport on the home page, and just the header band on
+// text-only page headers. Stars are stamped from pre-rendered sprites (no per-frame blur)
+// and the loop stops whenever the canvas is off screen or the tab is hidden.
+const initStarfield = (host, fixed) => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
 
-  const labelFor = (el) =>
-    el.dataset.hoverLabel ||
-    el.querySelector("h1, h2, h3, strong")?.textContent?.trim() ||
-    el.textContent.trim().split(/\s+/).slice(0, 4).join(" ");
+  canvas.className = fixed ? "starfield starfield-fixed" : "starfield";
+  canvas.setAttribute("aria-hidden", "true");
+  host.prepend(canvas);
 
-  document.querySelectorAll(hoverSelector).forEach((el) => {
-    el.addEventListener("pointermove", (event) => {
-      const rect = el.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      const isSmall = el.matches(".btn, .nav-links a, .footer-links a, .socials a, .tab-list button");
-      const scale = isSmall ? 1.06 : 1.015;
-      const lift = isSmall ? -1 : -4;
-      el.style.setProperty("--local-x", `${(x + 0.5) * 100}%`);
-      el.style.setProperty("--local-y", `${(y + 0.5) * 100}%`);
-      el.style.setProperty("--hover-spot", "1");
-      // subtle uniform lift — no 3D tilt, so the box and its image move together
-      el.style.transform = `translateY(${lift}px) scale(${scale})`;
-      if (readout) {
-        readout.textContent = labelFor(el);
-        readout.classList.add("active");
-      }
-    });
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const colors = ["255,255,255", "216,190,250", "196,161,245"];
+  const SPRITE = 48;
+  const PUSH_RADIUS = 120;
+  const LINE_RADIUS = 190;
 
-    el.addEventListener("pointerleave", () => {
-      el.style.removeProperty("--hover-spot");
-      el.style.transform = "";
-      readout?.classList.remove("active");
-    });
+  const sprites = colors.map((rgb) => {
+    const sprite = document.createElement("canvas");
+    sprite.width = sprite.height = SPRITE;
+    const sctx = sprite.getContext("2d");
+    const half = SPRITE / 2;
+    const gradient = sctx.createRadialGradient(half, half, 0, half, half, half);
+    gradient.addColorStop(0, `rgba(${rgb},1)`);
+    gradient.addColorStop(0.16, `rgba(${rgb},0.9)`);
+    gradient.addColorStop(0.36, "rgba(170,120,240,0.26)");
+    gradient.addColorStop(1, "rgba(170,120,240,0)");
+    sctx.fillStyle = gradient;
+    sctx.fillRect(0, 0, SPRITE, SPRITE);
+    return sprite;
   });
+
+  let width = 0;
+  let height = 0;
+  let stars = [];
+  let frame = 0;
+  let onScreen = true;
+  const pointer = { x: -9999, y: -9999 };
+
+  const makeStar = () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    size: 0.6 + Math.random() * 1.9,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    pulse: Math.random() * Math.PI * 2,
+    twinkle: 0.012 + Math.random() * 0.028,
+    color: Math.floor(Math.random() * colors.length),
+  });
+
+  const draw = () => {
+    ctx.clearRect(0, 0, width, height);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgb(216, 190, 250)";
+
+    for (const star of stars) {
+      const dx = star.x - pointer.x;
+      const dy = star.y - pointer.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance < PUSH_RADIUS && distance > 0.1) {
+        const push = (1 - distance / PUSH_RADIUS) * 3;
+        star.x += (dx / distance) * push;
+        star.y += (dy / distance) * push;
+      }
+
+      star.x += star.vx;
+      star.y += star.vy;
+      star.pulse += star.twinkle;
+
+      if (star.x < -10) star.x = width + 10;
+      if (star.x > width + 10) star.x = -10;
+      if (star.y < -10) star.y = height + 10;
+      if (star.y > height + 10) star.y = -10;
+
+      const glow = 0.5 + Math.sin(star.pulse) * 0.3;
+      const drawSize = (star.size + glow) * 6;
+      ctx.globalAlpha = 0.3 + glow * 0.6;
+      ctx.drawImage(sprites[star.color], star.x - drawSize / 2, star.y - drawSize / 2, drawSize, drawSize);
+
+      // Thin line tying each nearby star to the cursor, fading out with distance
+      const lineDistance = Math.hypot(star.x - pointer.x, star.y - pointer.y);
+      if (lineDistance < LINE_RADIUS) {
+        ctx.globalAlpha = 0.3 * (1 - lineDistance / LINE_RADIUS);
+        ctx.beginPath();
+        ctx.moveTo(star.x, star.y);
+        ctx.lineTo(pointer.x, pointer.y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Ring marking the area that pushes stars away from the cursor
+    if (pointer.x > -PUSH_RADIUS && pointer.x < width + PUSH_RADIUS && pointer.y > -PUSH_RADIUS && pointer.y < height + PUSH_RADIUS) {
+      const ringPulse = 4 * Math.sin(performance.now() * 0.004);
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(196, 161, 245, 0.34)";
+      ctx.beginPath();
+      ctx.arc(pointer.x, pointer.y, PUSH_RADIUS + ringPulse, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(196, 161, 245, 0.16)";
+      ctx.beginPath();
+      ctx.arc(pointer.x, pointer.y, PUSH_RADIUS * 0.5 - ringPulse, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  };
+
+  const loop = () => {
+    draw();
+    frame = requestAnimationFrame(loop);
+  };
+
+  const sync = () => {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    if (reduceMotion) draw();
+    else if (onScreen && !document.hidden) loop();
+  };
+
+  const resize = () => {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    width = rect.width;
+    height = rect.height;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    stars = Array.from({ length: Math.min(110, Math.max(24, Math.floor((width * height) / 13000))) }, makeStar);
+    sync();
+  };
+
+  resize();
+  window.addEventListener("resize", resize, { passive: true });
+  document.addEventListener("visibilitychange", sync);
+
+  if (!fixed) {
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
+    }).observe(canvas);
+  }
+
+  if (finePointer && !reduceMotion) {
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = event.clientX - rect.left;
+        pointer.y = event.clientY - rect.top;
+      },
+      { passive: true }
+    );
+    document.documentElement.addEventListener("pointerleave", () => {
+      pointer.x = pointer.y = -9999;
+    });
+  }
+};
+
+if (document.querySelector(".hero")) {
+  initStarfield(document.body, true);
+} else {
+  document.querySelectorAll(".page-head").forEach((head) => initStarfield(head, false));
 }
