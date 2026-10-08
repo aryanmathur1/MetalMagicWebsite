@@ -769,49 +769,54 @@ main,
   justify-content: center;
 }
 
+/* Logo and blurb share one grid cell, so the card is always tall enough for
+   whichever is bigger and the blurb can never be cut off. */
 .sponsor-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
   overflow: hidden;
   min-height: 150px;
-  padding: 22px;
   border: 1px solid #d9d1e6;
   border-radius: var(--radius);
   background: #fff;
 }
 
+.sponsor-card > * {
+  grid-area: 1 / 1;
+}
+
 .sponsor-card img {
+  place-self: center;
   width: auto;
+  max-width: calc(100% - 44px);
   max-height: 78px;
+  margin: 22px;
   object-fit: contain;
 }
 
 .sponsor-tier-magic .sponsor-card {
   min-height: 270px;
-  padding: 36px;
   border: 2px solid var(--brand);
   box-shadow: 10px 10px 0 var(--brand);
   margin: 0 10px 10px 0;
 }
 
 .sponsor-tier-magic .sponsor-card img {
+  max-width: calc(100% - 72px);
   max-height: 190px;
+  margin: 36px;
 }
 
 .sponsor-tier-gold .sponsor-card {
   min-height: 190px;
-  padding: 28px;
 }
 
 .sponsor-tier-gold .sponsor-card img {
+  max-width: calc(100% - 56px);
   max-height: 116px;
+  margin: 28px;
 }
 
 .sponsor-blurb {
-  position: absolute;
-  inset: 0;
   display: grid;
   align-content: center;
   justify-items: center;
@@ -835,6 +840,16 @@ main,
 
 .sponsor-blurb span {
   max-width: 46ch;
+}
+
+.sponsor-tier-silver .sponsor-blurb {
+  padding: 16px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.sponsor-tier-silver .sponsor-blurb strong {
+  font-size: 0.95rem;
 }
 
 .sponsor-tier-magic .sponsor-blurb {
@@ -1475,7 +1490,11 @@ main,
 
   .sponsor-tier-magic .sponsor-card {
     min-height: 190px;
-    padding: 24px;
+  }
+
+  .sponsor-tier-magic .sponsor-card img {
+    max-width: calc(100% - 48px);
+    margin: 24px;
   }
 
   .sponsor-tier-gold .sponsor-card {
@@ -1484,7 +1503,16 @@ main,
 
   .sponsor-tier-silver .sponsor-card {
     min-height: 92px;
-    padding: 12px;
+  }
+
+  .sponsor-tier-silver .sponsor-card img {
+    max-width: calc(100% - 24px);
+    margin: 12px;
+  }
+
+  /* Three logos across leaves no room for a readable blurb */
+  .sponsor-blurb {
+    display: none;
   }
 
   .tabs-bar {
