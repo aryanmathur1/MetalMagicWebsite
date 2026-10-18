@@ -1032,6 +1032,10 @@ main,
   line-height: 1.4;
 }
 
+.member span + p {
+  margin-top: 10px;
+}
+
 .member span {
   display: block;
   margin-top: 6px;
